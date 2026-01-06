@@ -7,8 +7,6 @@ function App() {
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
-	console.log(prices);
-
 	useEffect(() => {
 		const fetchPrices = async () => {
 			try {
@@ -36,16 +34,65 @@ function App() {
 
 	return (
 		<>
-			<form onSubmit={e => e.preventDefault()}>
-				<h5>Swap</h5>
-				<label htmlFor='input-amount'>Amount to send</label>
-				<input id='input-amount' />
+			<div className='swap-container'>
+				<form onSubmit={e => e.preventDefault()}>
+					<div className='swap-section'>
+						<div className='currency-input-group'>
+							<label htmlFor='input-amount'>Amount</label>
+							<div className='input-row'>
+								<div className='amount-section'>
+									<input
+										id='input-amount'
+										type='text'
+										placeholder='0'
+										className='amount-input'
+									/>
+									<span className='converted-value'>$34,408.24</span>
+								</div>
+								<select className='currency-select'>
+									<option value='USD'>🇺🇸 USD</option>
+									<option value='EUR'>🇪🇺 EUR</option>
+									<option value='GBP'>🇬🇧 GBP</option>
+								</select>
+							</div>
+						</div>
 
-				<label htmlFor='output-amount'>Amount to receive</label>
-				<input id='output-amount' />
+						<div className='swap-icon'>
+							<button
+								type='button'
+								className='swap-button'
+								aria-label='Swap currencies'>
+								↓
+							</button>
+						</div>
 
-				<button>CONFIRM SWAP</button>
-			</form>
+						<div className='currency-input-group'>
+							<label htmlFor='output-amount'>Converted to</label>
+							<div className='input-row'>
+								<div className='amount-section'>
+									<input
+										id='output-amount'
+										type='text'
+										placeholder='0'
+										className='amount-input'
+										readOnly
+									/>
+									<span className='converted-value'>kr393,492.63</span>
+								</div>
+								<select className='currency-select'>
+									<option value='NOK'>🇳🇴 NOK</option>
+									<option value='USD'>🇺🇸 USD</option>
+									<option value='EUR'>🇪🇺 EUR</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<button type='submit' className='confirm-button'>
+						Swap
+					</button>
+				</form>
+			</div>
 		</>
 	);
 }
