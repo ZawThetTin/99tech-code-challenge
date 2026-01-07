@@ -95,10 +95,17 @@ form {
 	display: flex;
 	align-items: center;
 	gap: 0.5rem;
+	position: relative;
 }
 
 .currency-select-container:hover {
 	background-color: #f9fafb;
+}
+
+.currency-display {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
 }
 
 .currency-icon {
@@ -107,6 +114,29 @@ form {
 	border-radius: 50%;
 	object-fit: contain;
 	background: #f3f4f6;
+	pointer-events: none;
+}
+
+.currency-icon-fallback {
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-weight: 600;
+	font-size: 0.875rem;
+	flex-shrink: 0;
+}
+
+.dropdown-arrow {
+	color: #9ca3af;
+	font-size: 0.75rem;
+	flex-shrink: 0;
+	pointer-events: none;
+	margin-left: auto;
 }
 
 .currency-select {
@@ -123,6 +153,10 @@ form {
 	background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239ca3af' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
 	background-repeat: no-repeat;
 	background-position: right 0.25rem center;
+	border: 5px solid red;
+	position: absolute;
+	inset: 0;
+	opacity: 0;
 }
 
 .swap-icon {

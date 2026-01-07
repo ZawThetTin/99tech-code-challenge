@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import './App.css';
 import type { Price } from './types/prices';
 
@@ -14,9 +14,7 @@ function App() {
 	const [inputCurrency, setInputCurrency] = useState<string>('');
 	const [outputCurrency, setOutputCurrency] = useState<string>('');
 	const [isSwapping, setIsSwapping] = useState(false);
-
-	const inputSelectRef = useRef<HTMLSelectElement | null>(null);
-	const outputSelectRef = useRef<HTMLSelectElement | null>(null);
+	const [failedIcons, setFailedIcons] = useState<Set<string>>(new Set());
 
 	const { uniqueCurrencies, latestPrices } = useMemo(() => {
 		if (prices.length === 0) {
@@ -135,27 +133,31 @@ function App() {
 		setIsSwapping(false);
 	};
 
-	const openSelect = (ref: React.RefObject<HTMLSelectElement | null>) => {
-		if (!ref || !ref.current) return;
-
-		ref.current.focus({ preventScroll: true });
-
-		if (typeof ref.current.showPicker === 'function') {
-			ref.current.showPicker();
-			return;
-		}
-
-		const event = new MouseEvent('mousedown', {
-			bubbles: true,
-			cancelable: true,
-			view: window,
-		});
-
-		ref.current.dispatchEvent(event);
+	const handleIconError = (currency: string) => {
+		setFailedIcons(prev => new Set(prev).add(currency));
 	};
 
 	const getTokenIcon = (currency: string): string => {
 		return `${TOKEN_ICON_BASE_URL}/${currency.toUpperCase()}.svg`;
+	};
+
+	const renderCurrencyIcon = (currency: string) => {
+		if (failedIcons.has(currency)) {
+			return (
+				<div className='currency-icon-fallback'>
+					{currency.charAt(0).toUpperCase()}
+				</div>
+			);
+		}
+
+		return (
+			<img
+				src={getTokenIcon(currency)}
+				alt={`${currency} icon`}
+				className='currency-icon'
+				onError={() => handleIconError(currency)}
+			/>
+		);
 	};
 
 	if (loading) {
@@ -194,26 +196,18 @@ function App() {
 							<div
 								className='currency-select-container'
 								role='button'
-								tabIndex={0}
-								onClick={() => openSelect(inputSelectRef)}
-								onKeyDown={e => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										openSelect(inputSelectRef);
-									}
-								}}>
+								tabIndex={0}>
 								{inputCurrency && (
-									<img
-										src={getTokenIcon(inputCurrency)}
-										alt={`${inputCurrency} icon`}
-										className='currency-icon'
-									/>
-								)}
+									<div className='currency-display'>
+										{renderCurrencyIcon(inputCurrency)}
+										<span>{inputCurrency}</span>
+									</div>
+								)}{' '}
+								<span className='dropdown-arrow'>▼</span>{' '}
 								<select
 									className='currency-select'
 									value={inputCurrency}
-									onChange={e => setInputCurrency(e.target.value)}
-									ref={inputSelectRef}>
+									onChange={e => setInputCurrency(e.target.value)}>
 									{uniqueCurrencies.map(currency => (
 										<option key={currency} value={currency}>
 											{currency}
@@ -250,26 +244,18 @@ function App() {
 							<div
 								className='currency-select-container'
 								role='button'
-								tabIndex={0}
-								onClick={() => openSelect(outputSelectRef)}
-								onKeyDown={e => {
-									if (e.key === 'Enter' || e.key === ' ') {
-										e.preventDefault();
-										openSelect(outputSelectRef);
-									}
-								}}>
+								tabIndex={0}>
 								{outputCurrency && (
-									<img
-										src={getTokenIcon(outputCurrency)}
-										alt={`${outputCurrency} icon`}
-										className='currency-icon'
-									/>
+									<div className='currency-display'>
+										{renderCurrencyIcon(outputCurrency)}
+										<span>{outputCurrency}</span>
+									</div>
 								)}
+								<span className='dropdown-arrow'>▼</span>
 								<select
 									className='currency-select'
 									value={outputCurrency}
-									onChange={e => setOutputCurrency(e.target.value)}
-									ref={outputSelectRef}>
+									onChange={e => setOutputCurrency(e.target.value)}>
 									{uniqueCurrencies.map(currency => (
 										<option key={currency} value={currency}>
 											{currency}
