@@ -163,7 +163,7 @@ function App() {
 	if (loading) {
 		return (
 			<div className='swap-container'>
-				<p>Loading prices...</p>
+				<p className='loading-text'>Loading prices...</p>
 			</div>
 		);
 	}

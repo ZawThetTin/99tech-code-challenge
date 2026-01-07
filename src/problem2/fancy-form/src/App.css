@@ -2,18 +2,26 @@
 	margin: 0 auto;
 	padding: 2rem;
 	display: flex;
-	justify-content: center;
-	align-items: center;
-	min-height: 100vh;
+	height: 100dvh;
+	width: 100dvw;
 }
 
 .swap-container {
-	width: 100%;
-	max-width: 440px;
 	padding: 2.5rem;
 	background: #f3f3f3;
 	border-radius: 52px;
 	box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+	min-height: 400px;
+	width: 100%;
+	max-width: 440px;
+	flex: 1;
+	margin: auto;
+}
+
+.loading-text {
+	text-align: center;
+	font-size: 1.25rem;
+	color: #6b7280;
 }
 
 form {
