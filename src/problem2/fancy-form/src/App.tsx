@@ -43,38 +43,6 @@ function App() {
 	}, [prices]);
 
 	useEffect(() => {
-		if (
-			!inputAmount ||
-			!inputCurrency ||
-			!outputCurrency ||
-			isNaN(Number(inputAmount))
-		) {
-			setOutputAmount('');
-			return;
-		}
-
-		const inputPrice = latestPrices.get(inputCurrency);
-		const outputPrice = latestPrices.get(outputCurrency);
-
-		if (!inputPrice || !outputPrice || outputPrice === 0) {
-			setOutputAmount('');
-			return;
-		}
-
-		const result = (Number(inputAmount) * inputPrice) / outputPrice;
-		setOutputAmount(result.toString());
-	}, [inputAmount, inputCurrency, outputCurrency, latestPrices]);
-
-	useEffect(() => {
-		if (uniqueCurrencies.length > 0 && !inputCurrency) {
-			setInputCurrency(uniqueCurrencies[0]);
-			setOutputCurrency(
-				uniqueCurrencies.length > 1 ? uniqueCurrencies[1] : uniqueCurrencies[0]
-			);
-		}
-	}, [uniqueCurrencies, inputCurrency]);
-
-	useEffect(() => {
 		(async () => {
 			try {
 				setLoading(true);
@@ -88,6 +56,8 @@ function App() {
 
 				const data = await response.json();
 				setPrices(data);
+				setInputCurrency(data[0]?.currency || '');
+				setOutputCurrency(data[1]?.currency || data[0]?.currency || '');
 				setError(null);
 				setLoading(false);
 			} catch (err) {
@@ -111,12 +81,58 @@ function App() {
 		}).format(value);
 	};
 
+	const syncCalculations = ({
+		inputAmount,
+		inputCurrency,
+		outputCurrency,
+	}: {
+		inputAmount: string;
+		inputCurrency: string;
+		outputCurrency: string;
+	}) => {
+		if (
+			!inputAmount ||
+			!inputCurrency ||
+			!outputCurrency ||
+			isNaN(Number(inputAmount))
+		) {
+			setOutputAmount('');
+			return;
+		}
+
+		const inputPrice = latestPrices.get(inputCurrency);
+		const outputPrice = latestPrices.get(outputCurrency);
+
+		if (!inputPrice || !outputPrice || outputPrice === 0) {
+			setOutputAmount('');
+			return;
+		}
+
+		const result = (Number(inputAmount) * inputPrice) / outputPrice;
+		setOutputAmount(result.toString());
+	};
+
 	const handleInputAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
 
 		if (value === '' || /^\d*\.?\d*$/.test(value)) {
 			setInputAmount(value);
+			syncCalculations({ inputAmount: value, inputCurrency, outputCurrency });
 		}
+	};
+
+	const handleSelectCurrency = (type: 'input' | 'output', currency: string) => {
+		if (type === 'input') {
+			setInputCurrency(currency);
+		} else {
+			setOutputCurrency(currency);
+		}
+
+		syncCalculations({
+			inputAmount,
+			inputCurrency,
+			outputCurrency: currency,
+		});
 	};
 
 	const handleSwapCurrencies = () => {
@@ -203,12 +219,12 @@ function App() {
 										{renderCurrencyIcon(inputCurrency)}
 										<span>{inputCurrency}</span>
 									</div>
-								)}{' '}
-								<span className='dropdown-arrow'>▼</span>{' '}
+								)}
+								<span className='dropdown-arrow'>▼</span>
 								<select
 									className='currency-select'
 									value={inputCurrency}
-									onChange={e => setInputCurrency(e.target.value)}>
+									onChange={e => handleSelectCurrency('input', e.target.value)}>
 									{uniqueCurrencies.map(currency => (
 										<option key={currency} value={currency}>
 											{currency}
@@ -256,7 +272,9 @@ function App() {
 								<select
 									className='currency-select'
 									value={outputCurrency}
-									onChange={e => setOutputCurrency(e.target.value)}>
+									onChange={e =>
+										handleSelectCurrency('output', e.target.value)
+									}>
 									{uniqueCurrencies.map(currency => (
 										<option key={currency} value={currency}>
 											{currency}
