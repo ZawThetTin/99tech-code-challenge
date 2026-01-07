@@ -24,6 +24,7 @@ function App() {
 		}
 
 		const priceMap = new Map<string, Price>();
+
 		prices.forEach(price => {
 			const existing = priceMap.get(price.currency);
 			if (!existing || new Date(price.date) > new Date(existing.date)) {
@@ -32,6 +33,7 @@ function App() {
 		});
 
 		const currencies = Array.from(priceMap.keys()).sort();
+
 		const latestPricesMap = new Map(
 			Array.from(priceMap.entries()).map(([currency, price]) => [
 				currency,
@@ -75,34 +77,36 @@ function App() {
 	}, [uniqueCurrencies, inputCurrency]);
 
 	useEffect(() => {
-		const fetchPrices = async () => {
+		(async () => {
 			try {
 				setLoading(true);
 				const response = await fetch(
 					'https://interview.switcheo.com/prices.json'
 				);
+
 				if (!response.ok) {
 					throw new Error(`HTTP error! status: ${response.status}`);
 				}
+
 				const data = await response.json();
 				setPrices(data);
-				console.log(data);
 				setError(null);
+				setLoading(false);
 			} catch (err) {
 				setError(err instanceof Error ? err.message : 'Failed to fetch prices');
 				setPrices([]);
-			} finally {
 				setLoading(false);
 			}
-		};
-
-		fetchPrices();
+		})();
 	}, []);
 
 	const formatNumber = (num: string | number): string => {
 		if (!num || num === '') return '0';
+
 		const value = typeof num === 'string' ? parseFloat(num) : num;
+
 		if (isNaN(value)) return '0';
+
 		return new Intl.NumberFormat('en-US', {
 			minimumFractionDigits: 2,
 			maximumFractionDigits: 6,
@@ -111,6 +115,7 @@ function App() {
 
 	const handleInputAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const value = e.target.value;
+
 		if (value === '' || /^\d*\.?\d*$/.test(value)) {
 			setInputAmount(value);
 		}
@@ -126,12 +131,15 @@ function App() {
 		setIsSwapping(true);
 		// Simulate API call with 2 seconds delay
 		await new Promise(resolve => setTimeout(resolve, 2000));
+
 		setIsSwapping(false);
 	};
 
 	const openSelect = (ref: React.RefObject<HTMLSelectElement | null>) => {
 		if (!ref || !ref.current) return;
+
 		ref.current.focus({ preventScroll: true });
+
 		if (typeof ref.current.showPicker === 'function') {
 			ref.current.showPicker();
 			return;
@@ -142,6 +150,7 @@ function App() {
 			cancelable: true,
 			view: window,
 		});
+
 		ref.current.dispatchEvent(event);
 	};
 
