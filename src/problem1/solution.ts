@@ -23,13 +23,9 @@ const sum_to_n_b = (n: number): number => {
 	 * Just a different approach. Not recommended for large n due to potential stack overflow
 	 */
 
-	const sum_to_n_recursive = (n: number): number => {
-		if (n === 1) return 1;
+	if (n === 1) return 1;
 
-		return n + sum_to_n_recursive(n - 1);
-	};
-
-	return sum_to_n_recursive(n);
+	return n + sum_to_n_b(n - 1);
 };
 
 /**
